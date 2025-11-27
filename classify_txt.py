@@ -99,12 +99,14 @@ def process_local_file():
     results = []
     print(f"파일 '{INPUT_FILE_PATH}'에서 문장을 읽고 분류를 시작합니다...")
 
+    header = ["Original_Sentence"] + LABELS
+    
     # CSV 파일 쓰기 설정
     with open(OUTPUT_FILE_PATH, 'w', newline='', encoding='utf-8') as outfile:
         csv_writer = csv.writer(outfile)
         # 헤더 작성
-        csv_writer.writerow(["Original_Sentence", "Classified_Label"])
-        
+        csv_writer.writerow(header)
+
         # 입력 TXT 파일 읽기
         with open(INPUT_FILE_PATH, 'r', encoding='utf-8') as infile:
             lines = infile.readlines()
@@ -119,7 +121,10 @@ def process_local_file():
                 label = classify_text_with_gpt(sentence, LABELS)
                 
                 # 결과를 CSV 파일에 즉시 기록
-                csv_writer.writerow([sentence, label])
+                data_row = [sentence] + [0] * len(LABELS)
+                label_index = LABELS.index(label)
+                data_row[label_index + 1] = 1
+                csv_writer.writerow(data_row)
                 
                 print(f"[{i + 1}/{total_lines}] 문장: '{sentence[:30]}...' -> 레이블: {label}")
                 
